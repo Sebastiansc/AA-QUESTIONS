@@ -3,19 +3,12 @@ require 'byebug'
 require_relative 'question'
 require_relative 'reply'
 require_relative 'question_database'
+require_relative 'model_base'
 
-class User
-  def self.find_by_id(id)
-    user = QuestionsDatabase.instance.execute(<<-SQL, id)
-      SELECT
-        *
-      FROM
-        users
-      WHERE
-        id = ?
-    SQL
+class User < ModelBase
 
-    User.new(user.first)
+  def self.table
+    'users'
   end
 
   def self.find_by_name(fname, lname)
@@ -34,7 +27,6 @@ class User
   attr_accessor :fname, :lname
   attr_reader :id
   def initialize(options = {})
-    byebug
     @fname = options['fname']
     @lname = options['lname']
     @id = options['id']
@@ -69,17 +61,6 @@ class User
     SQL
 
     average
-  end
-
-  def save
-    raise "#{self} already in database" if @id
-    QuestionsDatabase.instance.execute(<<-SQL, @fname, @lname)
-      INSERT INTO
-        users (fname, lname)
-      VALUES
-        (?, ?)
-    SQL
-      @id = QuestionsDatabase.instance.last_insert_row_id
   end
 
   def update

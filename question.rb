@@ -27,19 +27,6 @@ class Question < ModelBase
     QuestionFollow.most_followed_questions(n)
   end
 
-  # def self.find_by_id(id)
-  #   question = QuestionsDatabase.instance.execute(<<-SQL, id)
-  #     SELECT
-  #       *
-  #     FROM
-  #       questions
-  #     WHERE
-  #       id = ?
-  #   SQL
-  #
-  #   Question.new(question.first)
-  # end
-
   attr_accessor :title, :body
   attr_reader :user_id
   def initialize(options)
@@ -47,17 +34,6 @@ class Question < ModelBase
     @body = options['body']
     @id = options['id']
     @user_id = options['user_id']
-  end
-
-  def save
-    raise "#{self} already in database" if @id
-    QuestionsDatabase.instance.execute(<<-SQL, @user_id, @title, @body)
-      INSERT INTO
-        questions (user_id, title, body)
-      VALUES
-        (?, ?, ?)
-    SQL
-      @id = QuestionsDatabase.instance.last_insert_row_id
   end
 
   def update
